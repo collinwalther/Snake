@@ -12,9 +12,21 @@ class Direction(enum.Enum):
     DOWN = 2
     LEFT = 3
 
+    @staticmethod
+    def areOpposite(d1, d2):
+        if d1 == Direction.UP and d2 == Direction.DOWN:
+            return True
+        elif d1 == Direction.RIGHT and d2 == Direction.LEFT:
+            return True
+        elif d1 == Direction.DOWN and d2 == Direction.UP:
+            return True
+        elif d1 == Direction.LEFT and d2 == Direction.RIGHT:
+            return True
+        return False
+
 
 class Snake:
-    def __init__(self, window, secondsPerStep=.5):
+    def __init__(self, window, secondsPerStep=.25):
         self.secondsPerStep = secondsPerStep
         self.scr = window
         self.direction = Direction.RIGHT
@@ -30,23 +42,35 @@ class Snake:
 
     def directionListener(self):
         while True:
-            direction = curses.getch()
-            if self.direction != direction:
+            ch = self.scr.getch()
+            if ch == curses.KEY_UP:
+                direction = Direction.UP
+            elif ch == curses.KEY_RIGHT:
+                direction = Direction.RIGHT
+            elif ch == curses.KEY_DOWN:
+                direction = Direction.DOWN
+            elif ch == curses.KEY_LEFT:
+                direction = Direction.LEFT
+            else:
+                continue
+            if self.direction != direction and not Direction.areOpposite(self.direction, direction):
                 self.directionChanged = True
-            if direction == curses.KEY_UP:
-                self.direction = Direction.UP
-            elif direction == curses.KEY_RIGHT:
-                self.direction = Direction.RIGHT
-            elif direction == curses.KEY_DOWN:
-                self.direction = Direction.DOWN
-            elif direction == curses.KEY_LEFT:
-                self.direction = Direction.LEFT
+                self.direction = direction
+                if direction == curses.KEY_UP:
+                    self.direction = Direction.UP
+                elif direction == curses.KEY_RIGHT:
+                    self.direction = Direction.RIGHT
+                elif direction == curses.KEY_DOWN:
+                    self.direction = Direction.DOWN
+                elif direction == curses.KEY_LEFT:
+                    self.direction = Direction.LEFT
 
     def initBoard(self):
         # Configure curses
         curses.noecho()
         curses.cbreak()
         self.scr.box()
+        self.scr.keypad(True)
 
         # Mark the initial head of the snake
         self.vertices = [[1, 1], [4, 1]]
@@ -62,7 +86,7 @@ class Snake:
 
             # If these are horizontal vertices, draw a horizontal line.
             if self.horizontallyAligned(v1, v2):
-                self.scr.hline(v1[1], v1[0], '~', v2[0] - v1[0])
+                self.scr.hline(v1[1], v1[0], '~', int(math.fabsv2[0] - v1[0])
 
             # If these are vertical vertices, draw a vertical line.
             elif self.verticallyAligned(v1, v2):
@@ -72,6 +96,7 @@ class Snake:
         self.scr.addch(self.apple[1], self.apple[0], 'x')
 
         # Refresh.
+        self.scr.addstr(str(self.vertices))
         self.scr.box()
         self.scr.refresh()
 
@@ -122,24 +147,24 @@ class Snake:
         if self.directionChanged:
             self.directionChanged = False
             v = self.vertices[-1]
-            if self.direction == Direction.UP:
-                newV = [v[0], v[1] + 1]
-            elif self.direction == Direction.RIGHT:
-                newV = [v[0] + 1, v[1]]
-            elif self.direction == Direction.DOWN:
-                newV = [v[0], v[1] - 1]
-            elif self.direction == Direction.LEFT:
-                newV = [v[0] - 1, v[1]]
-            self.vertices.append(newV)
+            # if self.direction == Direction.UP:
+            #    newV = [v[0], v[1] + 1]
+            # elif self.direction == Direction.RIGHT:
+            #    newV = [v[0] + 1, v[1]]
+            # elif self.direction == Direction.DOWN:
+            #    newV = [v[0], v[1] - 1]
+            # elif self.direction == Direction.LEFT:
+            #    newV = [v[0] - 1, v[1]]
+            self.vertices.append([v[0], v[1]])
 
         # Advance the head vertex by one space.
         v = self.vertices[-1]
         if self.direction == Direction.UP:
-            self.vertices[-1] = [v[0], v[1] + 1]
+            self.vertices[-1] = [v[0], v[1] - 1]
         elif self.direction == Direction.RIGHT:
             self.vertices[-1] = [v[0] + 1, v[1]]
         elif self.direction == Direction.DOWN:
-            self.vertices[-1] = [v[0], v[1] - 1]
+            self.vertices[-1] = [v[0], v[1] + 1]
         elif self.direction == Direction.LEFT:
             self.vertices[-1] = [v[0] - 1, v[1]]
 
@@ -159,7 +184,7 @@ class Snake:
 
 
 def main(stdscr):
-    s = Snake(window=stdscr)
+    s = Snake(window=stdscr, secondsPerStep=.25)
     s.play()
 
 
