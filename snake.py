@@ -7,10 +7,10 @@ import time
 
 
 class Direction(enum.Enum):
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
+    UP = curses.KEY_UP
+    RIGHT = curses.KEY_RIGHT
+    DOWN = curses.KEY_DOWN
+    LEFT = curses.KEY_LEFT
 
     @staticmethod
     def areOpposite(d1, d2):
