@@ -13,7 +13,11 @@ class Direction(enum.Enum):
     LEFT = curses.KEY_LEFT
 
     @staticmethod
-    def areOpposite(d1, d2):
+    def areOpposite(cursesDirection1, cursesDirection2):
+        try:
+            d1, d2 = Direction(cursesDirection1), Direction(cursesDirection2)
+        except ValueError:
+            return False
         if d1 == Direction.UP and d2 == Direction.DOWN:
             return True
         elif d1 == Direction.RIGHT and d2 == Direction.LEFT:
@@ -23,6 +27,17 @@ class Direction(enum.Enum):
         elif d1 == Direction.LEFT and d2 == Direction.RIGHT:
             return True
         return False
+
+    @staticmethod
+    def isDirection(cursesDirection):
+        try:
+            d = Direction(cursesDirection)
+        except ValueError:
+            return False
+        return d == Direction.UP \
+                or d == Direction.RIGHT \
+                or d == Direction.DOWN \
+                or d == Direction.LEFT
 
 
 class Snake:
@@ -43,7 +58,9 @@ class Snake:
     def directionListener(self):
         while True:
             direction = self.scr.getch()
-            if self.direction != direction and not Direction.areOpposite(self.direction, direction):
+            if Direction.isDirection(direction) \
+                    and self.direction != direction \
+                    and not Direction.areOpposite(self.direction, direction):
                 self.directionChanged = True
                 self.direction = direction
                 if direction == curses.KEY_UP:
