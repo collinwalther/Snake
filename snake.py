@@ -42,17 +42,7 @@ class Snake:
 
     def directionListener(self):
         while True:
-            ch = self.scr.getch()
-            if ch == curses.KEY_UP:
-                direction = Direction.UP
-            elif ch == curses.KEY_RIGHT:
-                direction = Direction.RIGHT
-            elif ch == curses.KEY_DOWN:
-                direction = Direction.DOWN
-            elif ch == curses.KEY_LEFT:
-                direction = Direction.LEFT
-            else:
-                continue
+            direction = self.scr.getch()
             if self.direction != direction and not Direction.areOpposite(self.direction, direction):
                 self.directionChanged = True
                 self.direction = direction
