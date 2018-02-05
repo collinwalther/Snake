@@ -41,12 +41,13 @@ class Direction(enum.Enum):
 
 
 class Snake:
-    def __init__(self, window, secondsPerStep=.25):
+    def __init__(self, window, secondsPerStep=.25, startLength=3):
         self.secondsPerStep = secondsPerStep
         self.scr = window
         self.direction = Direction.RIGHT
         self.directionChanged = False
         self.score = 0
+        self.startLength = startLength
         self.initBoard()
         self.startDirectionListener()
 
@@ -72,8 +73,8 @@ class Snake:
         self.scr.box()
         self.scr.keypad(True)
 
-        # Mark the initial head of the snake
-        self.vertices = [[1, 1], [4, 1]]
+        # Mark the initial head and tail of the snake
+        self.vertices = [[1, 1], [1 + self.startLength, 1]]
 
         # Generate the first apple
         self.generateApple()
@@ -91,8 +92,6 @@ class Snake:
                     self.scr.hline(v1[1], v1[0], 'O', diff)
                 else:
                     self.scr.hline(v1[1], v1[0] + diff + 1, 'O', abs(diff))
-
-                #self.scr.hline(v1[1], v1[0], '~', abs(v2[0] - v1[0]))
 
             # If these are vertical vertices, draw a vertical line.
             elif self.verticallyAligned(v1, v2):
@@ -124,12 +123,15 @@ class Snake:
                       random.randint(1, curses.LINES - 2)]
 
     def step(self):
+        # Check to see if the snake eats the apple this turn.  This affects
+        # whether the snake grows in size or not.
         increase = False
         if self.snakeOnApple():
             increase = True
             self.consumeApple()
             self.generateApple()
-
+        
+        # Move the snake.
         self.moveSnake(increase)
 
         # If the game is lost, handle that.
@@ -170,14 +172,6 @@ class Snake:
         if self.directionChanged:
             self.directionChanged = False
             v = self.vertices[-1]
-            # if self.direction == Direction.UP:
-            #    newV = [v[0], v[1] + 1]
-            # elif self.direction == Direction.RIGHT:
-            #    newV = [v[0] + 1, v[1]]
-            # elif self.direction == Direction.DOWN:
-            #    newV = [v[0], v[1] - 1]
-            # elif self.direction == Direction.LEFT:
-            #    newV = [v[0] - 1, v[1]]
             self.vertices.append([v[0], v[1]])
 
         # Advance the head vertex by one space.
@@ -192,9 +186,34 @@ class Snake:
             self.vertices[-1] = [v[0] - 1, v[1]]
 
     def isLost(self):
+        # Check if the snake is out of bounds.
         for v in self.vertices:
-            if v[0] > curses.COLS - 2 or v[0] < 1 or v[1] > curses.LINES - 2 or v[1] < 1:
+            if v[0] > curses.COLS - 2 \
+                    or v[0] < 1 \
+                    or v[1] > curses.LINES - 2 \
+                    or v[1] < 1:
                 return True
+
+        # Check if the head has intersected the body.
+        #head = self.vertices[-1]
+        #for i in range(len(self.vertices) - 1):
+        #    v1, v2 = self.vertices[i], self.vertices[i + 1]
+        #    if self.horizontallyAligned(v1, v2) and self.horizontallyAligned(head, v1):
+        #        diff = v2[0] - v1[0]
+        #        if diff > 0:
+        #            if v1[0] <= head[0] <= v2[0]:
+        #                return True
+        #        else:
+        #            if v2[0] <= head[0] <= v1[0]:
+        #                return True
+        #    elif self.verticallyAligned(v1, v2) and self.verticallyAligned(head, v1):
+        #        diff = v2[1] - v1[1]
+        #        if diff > 0:
+        #            if v1[1] <= head[1] <= v2[1]:
+        #                return True
+        #        else:
+        #            if v2[1] <= head[1] <= v1[1]:
+        #                return True
         return False
 
     def handleLoss(self):
@@ -219,7 +238,7 @@ class Snake:
 
 
 def main(stdscr):
-    s = Snake(window=stdscr, secondsPerStep=.05)
+    s = Snake(window=stdscr, secondsPerStep=.05, startLength=10)
     s.play()
 
 
