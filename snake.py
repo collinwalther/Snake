@@ -62,15 +62,7 @@ class Snake:
                     and self.direction != direction \
                     and not Direction.areOpposite(self.direction, direction):
                 self.directionChanged = True
-                self.direction = direction
-                if direction == curses.KEY_UP:
-                    self.direction = Direction.UP
-                elif direction == curses.KEY_RIGHT:
-                    self.direction = Direction.RIGHT
-                elif direction == curses.KEY_DOWN:
-                    self.direction = Direction.DOWN
-                elif direction == curses.KEY_LEFT:
-                    self.direction = Direction.LEFT
+                self.direction = Direction(direction)
 
     def initBoard(self):
         # Configure curses
