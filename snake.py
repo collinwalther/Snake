@@ -86,11 +86,21 @@ class Snake:
 
             # If these are horizontal vertices, draw a horizontal line.
             if self.horizontallyAligned(v1, v2):
-                self.scr.hline(v1[1], v1[0], '~', int(math.fabsv2[0] - v1[0])
+                diff = v2[0] - v1[0]
+                if diff > 0:
+                    self.scr.hline(v1[1], v1[0], 'O', diff)
+                else:
+                    self.scr.hline(v1[1], v1[0] + diff + 1, 'O', abs(diff))
+
+                #self.scr.hline(v1[1], v1[0], '~', abs(v2[0] - v1[0]))
 
             # If these are vertical vertices, draw a vertical line.
             elif self.verticallyAligned(v1, v2):
-                self.scr.vline(v1[1], v1[0], '}', v2[1] - v1[1])
+                diff = v2[1] - v1[1]
+                if diff > 0:
+                    self.scr.vline(v1[1], v1[0], 'O', diff)
+                else:
+                    self.scr.vline(v1[1] + diff + 1, v1[0], 'O', abs(diff))
 
         # Draw the apple.
         self.scr.addch(self.apple[1], self.apple[0], 'x')
@@ -184,7 +194,7 @@ class Snake:
 
 
 def main(stdscr):
-    s = Snake(window=stdscr, secondsPerStep=.25)
+    s = Snake(window=stdscr, secondsPerStep=.05)
     s.play()
 
 
