@@ -69,6 +69,7 @@ class Snake:
         # Configure curses
         curses.noecho()
         curses.cbreak()
+        curses.curs_set(0)
         self.scr.box()
         self.scr.keypad(True)
 
@@ -106,7 +107,6 @@ class Snake:
         self.scr.addch(self.apple[1], self.apple[0], 'x')
 
         # Refresh.
-        self.scr.addstr(str(self.vertices))
         self.scr.box()
         self.scr.refresh()
 
@@ -121,36 +121,50 @@ class Snake:
             or (int(math.fabs(v1[1] - v2[1])) == 1)
 
     def generateApple(self):
-        self.apple = [random.randint(1, curses.COLS - 1),
-                      random.randint(1, curses.LINES - 1)]
+        self.apple = [random.randint(1, curses.COLS - 2),
+                      random.randint(1, curses.LINES - 2)]
 
     def step(self):
-        # Determine the direction in which to move
-        self.moveSnake()
+        increase = False
+        if self.snakeOnApple():
+            increase = True
+            self.consumeApple()
+            self.generateApple()
+
+        self.moveSnake(increase)
 
         # If the game is lost, handle that.
         if self.isLost():
             self.handleLoss()
+            
+    def snakeOnApple(self):
+        if self.vertices[-1] == self.apple:
+            return True
+        return False
 
-    def moveSnake(self):
+    def consumeApple(self):
+        self.score += 1
+
+    def moveSnake(self, increase=False):
         # If the tail of the snake is only one spot away from the first bend,
         # then just remove the tail vertex.
-        v1, v2 = self.vertices[0], self.vertices[1]
-        if self.adjacent(v1, v2):
-            self.vertices.pop(0)
+        if increase == False:
+            v1, v2 = self.vertices[0], self.vertices[1]
+            if self.adjacent(v1, v2):
+                self.vertices.pop(0)
 
-        # Otherwise, advance the tail by one tile.
-        else:
-            if self.horizontallyAligned(v1, v2):
-                if v1[0] < v2[0]:
-                    v1[0] += 1
-                else:
-                    v1[0] -= 1
-            elif self.verticallyAligned(v1, v2):
-                if v1[1] < v2[1]:
-                    v1[1] += 1
-                else:
-                    v1[1] -= 1
+            # Otherwise, advance the tail by one tile.
+            else:
+                if self.horizontallyAligned(v1, v2):
+                    if v1[0] < v2[0]:
+                        v1[0] += 1
+                    else:
+                        v1[0] -= 1
+                elif self.verticallyAligned(v1, v2):
+                    if v1[1] < v2[1]:
+                        v1[1] += 1
+                    else:
+                        v1[1] -= 1
 
         # Now move the head.
         # If the direction has been changed, add a new vertex to the snake.
@@ -179,11 +193,20 @@ class Snake:
             self.vertices[-1] = [v[0] - 1, v[1]]
 
     def isLost(self):
-        # TODO
+        for v in self.vertices:
+            if v[0] > curses.COLS - 2 or v[0] < 1 or v[1] > curses.LINES - 2 or v[1] < 1:
+                return True
         return False
 
     def handleLoss(self):
-        # TODO
+        self.scr.clear()
+        self.scr.addstr(curses.LINES // 2, curses.COLS // 2 - 5, "You lose :(")
+        scoreMessage = "Score: {}".format(self.score)
+        self.scr.addstr(curses.LINES // 2 + 1, (curses.COLS - len(scoreMessage)) // 2, scoreMessage)
+        self.scr.box()
+        self.scr.refresh()
+        self.scr.getch()
+        exit(0)
         return
 
     def play(self):
