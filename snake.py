@@ -200,10 +200,13 @@ class Snake:
 
     def handleLoss(self):
         self.scr.clear()
-        self.scr.addstr(curses.LINES // 2, curses.COLS // 2 - 5, "You lose :(")
+        loseMessage = "You lose :("
+        self.scr.addstr(curses.LINES // 2, (curses.COLS - len(loseMessage)) // 2, loseMessage)
         scoreMessage = "Score: {}".format(self.score)
         self.scr.addstr(curses.LINES // 2 + 1, (curses.COLS - len(scoreMessage)) // 2, scoreMessage)
-        self.scr.box()
+        quitMessage = "Press any key to quit."
+        self.scr.addstr(curses.LINES // 2 + 2, (curses.COLS - len(quitMessage)) // 2, quitMessage)
+        self.scr.box() 
         self.scr.refresh()
         self.scr.getch()
         exit(0)
