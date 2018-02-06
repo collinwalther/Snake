@@ -195,25 +195,25 @@ class Snake:
                 return True
 
         # Check if the head has intersected the body.
-        #head = self.vertices[-1]
-        #for i in range(len(self.vertices) - 1):
-        #    v1, v2 = self.vertices[i], self.vertices[i + 1]
-        #    if self.horizontallyAligned(v1, v2) and self.horizontallyAligned(head, v1):
-        #        diff = v2[0] - v1[0]
-        #        if diff > 0:
-        #            if v1[0] <= head[0] <= v2[0]:
-        #                return True
-        #        else:
-        #            if v2[0] <= head[0] <= v1[0]:
-        #                return True
-        #    elif self.verticallyAligned(v1, v2) and self.verticallyAligned(head, v1):
-        #        diff = v2[1] - v1[1]
-        #        if diff > 0:
-        #            if v1[1] <= head[1] <= v2[1]:
-        #                return True
-        #        else:
-        #            if v2[1] <= head[1] <= v1[1]:
-        #                return True
+        head = self.vertices[-1]
+        for i in range(len(self.vertices) - 2):
+            v1, v2 = self.vertices[i], self.vertices[i + 1]
+            if self.horizontallyAligned(v1, v2) and self.horizontallyAligned(head, v1):
+                diff = v2[0] - v1[0]
+                if diff > 0:
+                    if v1[0] <= head[0] <= v2[0]:
+                        return True
+                else:
+                    if v2[0] <= head[0] <= v1[0]:
+                        return True
+            elif self.verticallyAligned(v1, v2) and self.verticallyAligned(head, v1):
+                diff = v2[1] - v1[1]
+                if diff > 0:
+                    if v1[1] <= head[1] <= v2[1]:
+                        return True
+                else:
+                    if v2[1] <= head[1] <= v1[1]:
+                        return True
         return False
 
     def handleLoss(self):
